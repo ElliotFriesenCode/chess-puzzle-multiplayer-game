@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    
+</head>
+<body>
+  <div class="info-div" id="info-div">
+    <div class="relative">
+      <div class="x" onclick="exit()">
+        <h1\>&#10060;</h1>
+      </div>
+      <div class="x-top">
+        <h1 id="name-text">Elliot</h1>
+      </div>
+      <div class="x-middle-top">
+        <h1 class="time-holder">Time taken (mm:ss): <span id="time-text"></span></h1>
+      </div>
+      <div class="x-middle-bottom" id="answers-holder">
+       
+        <h2 id="response-text"></h2>
+      </div>
+      
+    </div>
+  </div>
+<div class="top-host">
+    <p class="code" id="gamecode"></p>
+</div>
+<div class="middle-host">
+   <h1>Leaderboard</h1>
+</div>
+<div class="bottom-host">
+    <div class="host-middle" id="hm">
+      
+        
+   
+    </div>
+</div>
+<button id="view-spreadsheet" onclick="spreadsheet()">View Spreadsheet</button>
+<script>
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const gamecode = urlParams.get('gamecode');
+    function spreadsheet(){
+      window.location.href = './tableData.html?' + "gamecode=" + gamecode;
+    }
+    //alert(gamecode);
+    document.getElementById("gamecode").textContent = gamecode;
+    function exit(){
+      const parent = document.getElementById("answers-holder")
+while (parent.firstChild) {
+    parent.firstChild.remove();
+}
+    document.getElementById("info-div").style.display = "none";
+  }
+</script>
+<script type="module">
+   import {doc, onSnapshot} from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
+ import {hostGetNames} from './functions/hostGetNames.js';
+import {db} from './functions/main.js';
+let timeTotal;
+const unsub = onSnapshot(doc(db, "games", gamecode), (doc) => {
+    hostGetNames(gamecode).then((response) => {loadNames(response.names, response.scores, response.puzzleCount, response.gameLength);
+      timeTotal = response.gameLength;
+    });
+});
+
+ 
+  function loadNames(names, scores, puzzleCount, gameLength){
+    if(scores){
+    for(var i = 0; i < scores.length; i++){
+    for(var j = 0; j < ( scores.length - i -1 ); j++){
+      if(scores[j] < scores[j+1]){
+
+        var temp = scores[j]
+        scores[j] = scores[j + 1]
+        scores[j+1] = temp
+        var temp1 = names[j]
+        names[j] = names[j + 1]
+        names[j+1] = temp1
+      }
+    }
+  }
+}
+    const parent = document.getElementById("hm")
+while (parent.firstChild) {
+    parent.firstChild.remove();
+}
+if(names){
+  let x = 0;
+    for(let i = 0; i < names.length; i++){
+    let bar = document.createElement("div");
+    bar.addEventListener('click', function() { doo(i, names[i]) } );
+    bar.classList.add("bar");
+    let l = document.createElement("l");
+    l.classList.add("l");
+    let r = document.createElement("r");
+    r.classList.add("r");
+    let rh = document.createElement("H1");
+    let rt;
+    if(scores[i] === -1){
+    rt = document.createTextNode("Not Submitted");
+    }
+    else{
+     rt = document.createTextNode(scores[i]  + "/" + puzzleCount);
+    }
+    rh.appendChild(rt);
+    r.appendChild(rh);
+    let h = document.createElement("H1");
+    h.id = x;
+  
+    let t = document.createTextNode(names[i]);
+    h.appendChild(t);
+   
+    l.appendChild(h);
+    bar.appendChild(l);
+    bar.appendChild(r);
+    document.getElementById("hm").appendChild(bar);
+    x++;
+    }
+  }
+  }
+  import {getUserData} from './functions/getUserData.js';
+  function doo(id, name){
+    getUserData(gamecode, name).then((value) => {
+      let val =  timeTotal - value.time;
+       
+      if(value.time !== -1){
+      let puzzleArray = [];
+      let incorrectArray = [];
+      let correctArray = [];
+      let responseString = "";
+    
+      for(let i = 0; i < value.rightMoves.length; i+=2){
+        if(parseInt(value.rightMoves[i]) !== parseInt(value.playerMoves[i]) || parseInt(value.rightMoves[i + 1]) !== parseInt(value.playerMoves[i + 1])){
+         puzzleArray.push(i/2);
+         incorrectArray.push([value.playerMoves[i], value.playerMoves[i + 1]]);
+         correctArray.push([value.rightMoves[i], value.rightMoves[i + 1]]);
+          
+        }
+      }
+      showAlert(name, val, responseString, puzzleArray, incorrectArray, correctArray);
+     // alert(responseString);
+      }
+    })
+  }
+  function showAlert(name, time, responseString, puzzleArray, incorrectArray, correctArray){
+    document.getElementById("name-text").textContent = name;
+   
+   
+      document.getElementById("time-text").textContent =  Math.floor(time / 60) + ":" + time % 60;
+   
+   for(let i = 0; i < puzzleArray.length; i++){
+    let holderDiv = document.getElementById("answers-holder");
+    let responseDiv = document.createElement("div");
+    responseDiv.classList.add("response-holder");
+    let d1 = document.createElement("div");
+    d1.classList.add("response-left");
+    let tnode1 = document.createTextNode(puzzleArray[i] + 1);
+    d1.appendChild(tnode1);
+    let d2 = document.createElement("div");
+    d2.classList.add("response-middle");
+    let tnode2 = document.createTextNode("Incorrect Move (" + incorrectArray[i][0] + " " + incorrectArray[i][1] + ")");
+    d2.appendChild(tnode2);
+    let d3 = document.createElement("div");
+    d3.classList.add("response-right");
+    let tnode3 = document.createTextNode("Correct Move (" + correctArray[i][0] + " " + correctArray[i][1] + ")");
+    d3.appendChild(tnode3);
+    responseDiv.appendChild(d1);
+    responseDiv.appendChild(d2);
+    responseDiv.appendChild(d3);
+    holderDiv.appendChild(responseDiv);
+   }
+    document.getElementById("info-div").style.display = "block";
+  }
+  
+</script>
+
+</body>

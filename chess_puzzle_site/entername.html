@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<head>
+<link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    
+<div class="home-top1">
+    <h1 class="tutorial-text">After entering the challenge, you will be presented with different chess positions. Your goal is to select the best move possible within the limited time.
+        To select a move, you must press the square of the piece followed by the desired location. Good Luck:)
+    </h1>
+    
+</div>
+<div class="home-middle1">
+    <input type="text" class="gamename" id="g" placeholder="Name">
+  
+    <button class="gamecode-enter" id="b">Begin Challenge</button>
+</div>
+
+<script>
+ 
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const gamecode = urlParams.get('gamecode');
+   // alert(gamecode);
+ 
+</script>
+<script type="module">
+ 
+    import {userGetNames} from './functions/userGetNames.js';
+    import {addName} from './functions/updateNames.js';
+    document.getElementById("b").addEventListener("click", function(){
+        
+        userGetNames(gamecode).then((response) => addName(gamecode, document.getElementById("g").value, response.scores, response.times, response.userPositions, response.positionArray.length).then(() => handleNext()));
+        
+    }, false);
+    function handleNext(){
+    window.location.href = './chess.html?gamecode=' + gamecode + '&name=' + document.getElementById("g").value;
+    }
+</script>
+</body>

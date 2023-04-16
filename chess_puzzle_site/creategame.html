@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="styles.css">
+    
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="center">
+    <div class="top-create">
+        <div class="enter-holder">
+            <input type="text" class="fen" placeholder="ENTER NEW BOARD FEN" id="fen" oninput="generate()">
+            <input type="text" class="pos" placeholder="id 1" id="pos0">
+            <input type="text" class="pos" placeholder="id 2" id="pos1">
+            <button onclick="add()" class="pos" id="plus">+</button>
+            
+        </div>
+    </div>
+    <div class="middle-create" >
+        <div class="cgh" id="holder">
+        
+        </div>
+        
+        
+        
+    </div>
+    <div class="bottom-create">
+        <input type="text" class="time" placeholder="time (s)" id="t">
+        <button class="gamecode-enter1" id="create">Create Game</button>
+        
+    </div>
+</div>
+<div class="create-game-data-holder">
+    <div class="cgdh-top">
+        <h1 class="cgdh-text">Added Positions</h1>
+    </div>
+    <div class="cgdh-bottom" id="m"></div>
+</div>
+<script>
+let fenArray = [];
+let posArray = [];
+function add(){
+    let fen_value;
+    if(document.getElementById('fen').value){
+    fen_value = document.getElementById('fen').value;
+}
+else{
+  fen_value = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+}
+    fenArray.push(fen_value);
+    posArray.push(document.getElementById('pos0').value);
+    posArray.push(document.getElementById('pos1').value);
+    let holderDiv = document.createElement("div");
+    holderDiv.classList.add("enter-holder");
+    let p1 = document.createElement("p");
+    p1.classList.add("fen1");
+    let p1text = document.createTextNode(fen_value);
+    p1.appendChild(p1text);
+    let p2 = document.createElement("p");
+    p2.classList.add("pos1");
+    let p2text = document.createTextNode(document.getElementById('pos0').value);
+    p2.appendChild(p2text);
+    let p3 = document.createElement("p");
+    p3.classList.add("pos1");
+    let p3text = document.createTextNode(document.getElementById('pos1').value);
+    p3.appendChild(p3text);
+    holderDiv.appendChild(p1);
+    holderDiv.appendChild(p2);
+    holderDiv.appendChild(p3);
+    document.getElementById("m").appendChild(holderDiv);
+    document.getElementById('fen').value = "";
+    document.getElementById('pos0').value = "";
+    document.getElementById('pos1').value = "";
+    console.log(fenArray);
+    console.log(posArray);
+}
+
+
+
+let chessGrid = [[['w', 0, '', []], ['b', 1, '', []], ['w', 2, '', []], ['b', 3, '', []], ['w', 4, '', []], ['b', 5, '', []], ['w', 6, '', []], ['b', 7, '', []]],
+                         [['b', 8, '', []], ['w', 9, '', []], ['b', 10, '', []], ['w', 11, '', []], ['b', 12, '', []], ['w', 13, ''], ['b', 14, '', []], ['w', 15, '', []]],
+                         [['w', 16, '', []], ['b', 17, '', []], ['w', 18, '', []], ['b', 19, '', []], ['w', 20, '', []], ['b', 21, '', []], ['w', 22, '', []], ['b', 23, '', []]],
+                         [['b', 24, '', []], ['w', 25, '', []], ['b', 26, '', []], ['w', 27, '', []], ['b', 28, '', []], ['w', 29, '', []], ['b', 30, '', []], ['w', 31, '', []]],
+                         [['w', 32, '', []], ['b', 33, '', []], ['w', 34, '', []], ['b', 35, '', []], ['w', 36, '', []], ['b', 37, '', []], ['w', 38, '', []], ['b', 39, '', []]],
+                         [['b', 40, '', []], ['w', 41, '', []], ['b', 42, '', []], ['w', 43, '', []], ['b', 44, '', []], ['w', 45, '', []], ['b', 46, '', []], ['w', 47, '', []]],
+                         [['w', 48, '', []], ['b', 49, '', []], ['w', 50, '', []], ['b', 51, '', []], ['w', 52, '', []], ['b', 53, '', []], ['w', 54, ''], ['b', 55, '', []]],
+                         [['b', 56, '', []], ['w', 57, '', []], ['b', 58, '', []], ['w', 59, '', []], ['b', 60, '', []], ['w', 61, '', []], ['b', 62, ''], ['w', 63, '', []]]];
+generate();
+function generate(){
+clearChessArray();
+if(document.getElementById('fen').value){
+    fenToGrid(document.getElementById('fen').value);
+}
+else{
+    fenToGrid("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+}
+removeChildren("holder");
+createGrid();
+    }
+    function fenToGrid(fen){
+            let index = -1;
+            for(let i = 0; i < fen.length; i++){
+             
+              if(!isNaN(fen.charAt(i))){
+                index += parseInt(fen.charAt(i));
+              }
+              else if(fen.charAt(i) !== '/'){
+                index++;
+              }
+              
+               
+                if(fen.charAt(i) === 'r'){
+                    for(let i = 0; i < chessGrid.length; i++){
+                    for(let x = 0; x < chessGrid[i].length; x++){
+                        if(chessGrid[i][x][1] === index){
+                        
+                          chessGrid[i][x][2] = 'br';
+                        }
+                    }
+                }
+                }
+                else if(fen.charAt(i) === 'n'){
+                    for(let i = 0; i < chessGrid.length; i++){
+                    for(let x = 0; x < chessGrid[i].length; x++){
+                        if(chessGrid[i][x][1] === index){
+                        
+                          chessGrid[i][x][2] = 'bk';
+                        }
+                    }
+                }
+                }
+                else if(fen.charAt(i) === 'b'){
+                    for(let i = 0; i < chessGrid.length; i++){
+                    for(let x = 0; x < chessGrid[i].length; x++){
+                        if(chessGrid[i][x][1] === index){
+                        
+                          chessGrid[i][x][2] = 'bb';
+                        }
+                    }
+                }
+                }
+                else if(fen.charAt(i) === 'q'){
+                    for(let i = 0; i < chessGrid.length; i++){
+                    for(let x = 0; x < chessGrid[i].length; x++){
+                        if(chessGrid[i][x][1] === index){
+                        
+                          chessGrid[i][x][2] = 'bq';
+                        }
+                    }
+                }
+                }
+                else if(fen.charAt(i) === 'k'){
+                    for(let i = 0; i < chessGrid.length; i++){
+                    for(let x = 0; x < chessGrid[i].length; x++){
+                        if(chessGrid[i][x][1] === index){
+                        
+                          chessGrid[i][x][2] = 'bki';
+                        }
+                    }
+                }
+                }
+                else if(fen.charAt(i) === 'p'){
+                    for(let i = 0; i < chessGrid.length; i++){
+                    for(let x = 0; x < chessGrid[i].length; x++){
+                        if(chessGrid[i][x][1] === index){
+                        
+                          chessGrid[i][x][2] = 'bp';
+                        }
+                    }
+                }
+                }
+                else if(fen.charAt(i) === 'R'){
+                    for(let i = 0; i < chessGrid.length; i++){
+                    for(let x = 0; x < chessGrid[i].length; x++){
+                        if(chessGrid[i][x][1] === index){
+                        
+                          chessGrid[i][x][2] = 'wr';
+                        }
+                    }
+                }
+                }
+                else if(fen.charAt(i) === 'N'){
+                    for(let i = 0; i < chessGrid.length; i++){
+                    for(let x = 0; x < chessGrid[i].length; x++){
+                        if(chessGrid[i][x][1] === index){
+                        
+                          chessGrid[i][x][2] = 'wk';
+                        }
+                    }
+                }
+                }
+                else if(fen.charAt(i) === 'B'){
+                    for(let i = 0; i < chessGrid.length; i++){
+                    for(let x = 0; x < chessGrid[i].length; x++){
+                        if(chessGrid[i][x][1] === index){
+                        
+                          chessGrid[i][x][2] = 'wb';
+                        }
+                    }
+                }
+                }
+                else if(fen.charAt(i) === 'Q'){
+                    for(let i = 0; i < chessGrid.length; i++){
+                    for(let x = 0; x < chessGrid[i].length; x++){
+                        if(chessGrid[i][x][1] === index){
+                        
+                          chessGrid[i][x][2] = 'wq';
+                        }
+                    }
+                }
+                }
+                else if(fen.charAt(i) === 'K'){
+                    for(let i = 0; i < chessGrid.length; i++){
+                    for(let x = 0; x < chessGrid[i].length; x++){
+                        if(chessGrid[i][x][1] === index){
+                        
+                          chessGrid[i][x][2] = 'wki';
+                        }
+                    }
+                }
+                }
+                else if(fen.charAt(i) === 'P'){
+                    for(let i = 0; i < chessGrid.length; i++){
+                    for(let x = 0; x < chessGrid[i].length; x++){
+                        if(chessGrid[i][x][1] === index){
+                          chessGrid[i][x][2] = 'wp';
+                        }
+                    }
+                }
+                }
+                
+            }
+            
+        }
+      
+        function createGrid(){
+           
+           for(let i = 0; i < chessGrid.length; i++){
+               for(let x = 0; x < chessGrid[i].length; x++){
+               let box = document.createElement("div");
+               if(chessGrid[i][x][0] === 'w'){
+                   
+                   box.classList.add("box-white");
+                   box.classList.add("box");
+                  
+               }
+               else{
+                   box.classList.add("box-black");
+                   box.classList.add("box");   
+               }
+               
+            
+               var img = document.createElement("img");
+               if(chessGrid[i][x][2] == 'wq'){     
+                        img.src = "./pieces/wq.png";
+                        img.classList.add("chess");
+                   }
+                   else if(chessGrid[i][x][2] == 'wp'){
+                       
+                        img.src =  "./pieces/wp.png";
+                        img.classList.add("chess_pawn");  
+                   }
+                   else if(chessGrid[i][x][2] == 'wki'){
+                     
+                        img.src = "./pieces/wki.png";
+                        img.classList.add("chess");  
+                   }
+                   else if(chessGrid[i][x][2] == 'wb'){
+                      
+                        img.src = "./pieces/wb.png";
+                        img.classList.add("chess");  
+                   }
+                   else if(chessGrid[i][x][2] == 'wk'){
+                       
+                        img.src = "./pieces/wk.png";
+                        img.classList.add("chess_knight");  
+                   }
+                   else if(chessGrid[i][x][2] == 'wr'){
+                       
+                        img.src = "./pieces/wr.png";
+                        img.classList.add("chess");  
+                   }
+                   else  if(chessGrid[i][x][2] == 'bq'){     
+                        img.src = "./pieces/bq.png";
+                        img.classList.add("chess");
+                   }
+                   else if(chessGrid[i][x][2] == 'bp'){
+                       
+                        img.src = "./pieces/bp.png";
+                        img.classList.add("chess");  
+                   }
+                   else if(chessGrid[i][x][2] == 'bki'){
+                     
+                        img.src = "./pieces/bki.png";
+                        img.classList.add("chess");  
+                   }
+                   else if(chessGrid[i][x][2] == 'bb'){
+                       
+                        img.src = "./pieces/bb.png";
+                        img.classList.add("chess_bishop");  
+                   }
+                   else if(chessGrid[i][x][2] == 'bk'){
+                        
+                        img.src = "./pieces/bk.png";
+                        img.classList.add("chess_knight");  
+                   }
+                   else if(chessGrid[i][x][2] == 'br'){
+                        
+                        img.src = "./pieces/br.png";
+                        img.classList.add("chess");  
+                   }
+                   if(img.src){
+                   box.appendChild(img);
+                   }
+                   
+                   box.addEventListener("click", function(){
+                   squareClick(this.id);
+                });
+
+               box.id = chessGrid[i][x][1];
+               document.getElementById("holder").appendChild(box);
+               }
+           }
+       }
+       function clearChessArray(){
+            for(let i = 0; i < chessGrid.length; i++){
+            for(let x = 0; x < chessGrid[i].length; x++){
+                chessGrid[i][x][2] = '';
+            }
+        }
+        }
+        function removeChildren(id){
+            var child = document.getElementById(id).lastElementChild; 
+        while (child) {
+            document.getElementById(id).removeChild(child);
+            child = document.getElementById(id).lastElementChild;
+        }
+        }    
+        
+        let move = [-1, -1];
+        let numSelected = 0;
+        function squareClick(e){
+            let id = 0;
+            let piece = '';
+            let square = '';
+            for(let i = 0; i < chessGrid.length; i++){
+                for(let x = 0; x < chessGrid.length; x++){
+                    if(chessGrid[i][x][1] === parseInt(e)){
+                        piece = chessGrid[i][x][2];
+                        square = chessGrid[i][x][0];
+                        id = chessGrid[i][x][1];
+                    }
+                }
+            }
+            if(document.getElementById(e).classList.contains("box-selected")){
+               move[0] = -1;
+               move[1] = -1;
+                    for(let i = 0; i < chessGrid.length; i++){
+                for(let x = 0; x < chessGrid.length; x++){
+                 
+                    document.getElementById(chessGrid[i][x][1]).classList.remove("box-selected");
+                    
+                    if(chessGrid[i][x][0] === 'w'){
+                        document.getElementById(chessGrid[i][x][1]).classList.add("box-white");
+                    }
+                    else{
+                        document.getElementById(chessGrid[i][x][1]).classList.add("box-black");
+                    }
+                   }
+                
+            }
+            numSelected = 0;
+            
+                
+            }
+            else if(numSelected === 0){
+                move[0] = id;
+                move[1] = -1;
+                document.getElementById(e).classList.remove("box-white");
+    document.getElementById(e).classList.remove("box-black");
+    document.getElementById(e).classList.add("box-selected");
+     move[0] = id;
+    numSelected++;
+            }
+            else if(numSelected === 1){
+               
+                document.getElementById(e).classList.remove("box-white");
+    document.getElementById(e).classList.remove("box-black");
+    document.getElementById(e).classList.add("box-selected");
+    move[1] = id;
+   
+    numSelected++;
+            }
+            else if(numSelected === 2){
+              //  alert("hi");
+               move[0] = -1;
+               move[1] = -1;
+                for(let i = 0; i < chessGrid.length; i++){
+                for(let x = 0; x < chessGrid.length; x++){
+                 
+                    document.getElementById(chessGrid[i][x][1]).classList.remove("box-selected");
+                    
+                    if(chessGrid[i][x][0] === 'w'){
+                        document.getElementById(chessGrid[i][x][1]).classList.add("box-white");
+                    }
+                    else{
+                        document.getElementById(chessGrid[i][x][1]).classList.add("box-black");
+                    }
+                   }
+                
+            }
+            numSelected = 0;
+            }
+          //alert(pastMoves);
+   document.getElementById("pos0").value = move[0];
+   document.getElementById("pos1").value = move[1];
+ }
+       
+</script>
+<script type="module">
+    import {create} from './functions/createGame.js';
+    document.getElementById("create").addEventListener("click", function(){
+        create(JSON.stringify(Math.floor(100000 + Math.random() * 900000)), fenArray, posArray, parseInt(document.getElementById("t").value))
+        
+    }, false);
+</script>
+</body>

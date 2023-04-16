@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    
+</head>
+<body>
+    <div class="tableData-main">
+        <div class="tableData-top"></div>
+    <div class="tableData-main1">
+    <div class="table-container">
+        <table id="table-data">
+        
+        </table>
+    </div>
+    </div>
+    <div class="tableData-top"></div>
+    </div>
+
+   <!--  <button onClick="exportTableToExcel('table-data', 'puzzle-data')">Export Data to Excel</button> -->
+
+    <script>
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const gamecode = urlParams.get('gamecode');
+  </script>
+    <script type="module">
+        import {userGetNames} from './functions/userGetNames.js';
+        userGetNames(gamecode).then((response) => {
+            let names = response.names;
+            let positions = response.userPositions;
+            let correctPositions = response.positionArray;
+           // alert(positions);
+          //  alert(correctPositions);
+            let tr = document.createElement('tr');
+            let namesTH = document.createElement('th');
+            namesTH.appendChild(document.createTextNode("Names"));
+            tr.appendChild(namesTH);
+            for(let i = 0; i < correctPositions.length; i+=2){
+                let puzzleTH = document.createElement('th');
+                puzzleTH.appendChild(document.createTextNode("Puzzle " + i/2));
+                tr.appendChild(puzzleTH);
+            }
+            document.getElementById("table-data").appendChild(tr);
+            let puzzleScores = new Array(correctPositions.length/2).fill(0);
+           
+            for(let i = 0; i < names.length; i++){
+                let currTR = document.createElement('tr');
+                let nameTD = document.createElement('td');
+                let currName = names[i];
+                nameTD.appendChild(document.createTextNode(currName));
+                currTR.appendChild(nameTD);
+                
+                for(let x = 0; x < correctPositions.length; x += 2){
+                    let tableData = 1;
+                    if(parseInt(positions[i * correctPositions.length + x]) !== parseInt(correctPositions[x]) || parseInt(positions[ i * correctPositions.length + x + 1]) !== parseInt(correctPositions[x + 1])){
+                        tableData = 0;
+                    }
+                    if(tableData === 1){
+                        puzzleScores[x/2] = puzzleScores[x/2] + 1;
+                       
+                    }
+                    let puzzleTD = document.createElement('td');
+                    puzzleTD.appendChild(document.createTextNode(tableData));
+                    currTR.appendChild(puzzleTD);
+                }
+                 
+            document.getElementById("table-data").appendChild(currTR);
+            }
+            let scoreTR = document.createElement('tr');
+            scoreTR.appendChild(document.createElement("td"));
+            for(let i = 0; i < correctPositions.length; i+=2){
+               
+                let scoreTD = document.createElement('td');
+                let newStr = JSON.stringify(puzzleScores[i/2] + "/" + names.length);
+                //newStr = newStr.substring(1);
+               // newStr = newStr.substring(0,  newStr.length - 1);
+                scoreTD.appendChild(document.createTextNode(newStr));
+                scoreTR.appendChild(scoreTD);
+            }
+            document.getElementById("table-data").appendChild(scoreTR);
+            exportTableToExcel('table-data', 'puzzle-test-data');
+        });
+
+      
+    </script>
+    <script>
+        
+          function exportTableToExcel(tableID, filename = ''){
+            var downloadLink;
+            var dataType = 'application/vnd.ms-excel';
+            var tableSelect = document.getElementById(tableID);
+            var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+
+            filename = filename?filename+'.xls':'excel_data.xls';
+            downloadLink = document.createElement('a');
+            document.body.appendChild(downloadLink);
+            if(navigator.msSaveOrOpenBlob){
+                var blob = new Blob(['\ufeff', tableHTML],{
+                    type: dataType
+                });
+                navigator.msSaveOrOpenBlob(blob, filename);
+            }else{
+                downloadLink.href = 'data:' + dataType  + ', ' + tableHTML;
+                downloadLink.download = filename;
+                downloadLink.click();
+            }
+            window.location.href="./hostgame.html?gamecode=" + gamecode;
+        }
+      
+    </script>
+ 
+</body>

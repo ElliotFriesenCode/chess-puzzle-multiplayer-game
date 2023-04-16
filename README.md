@@ -1,3 +1,3 @@
 # chess-puzzle-multiplayer-game
-This site provides a platform for teachers to create a chess puzzle competition and have studens join and play
+This site provides a platform for teachers to create chess puzzle competitions<br>
 https://todo-81360.firebaseapp.com/
